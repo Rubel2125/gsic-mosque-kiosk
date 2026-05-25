@@ -3,11 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>Masjid Donation</title>
   <link href="https://fonts.googleapis.com/css2?family=Lateef:wght@400;700&family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
-  <script src="https://sandbox.web.squarecdn.com/v1/square.js"></script>
+  <!-- Square Point of Sale API — no SDK needed, uses URL scheme -->
 
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -33,7 +31,7 @@
 
     body {
       font-family: 'DM Sans', sans-serif;
-      background: 9FCB98;
+      background: var(--green);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -87,7 +85,7 @@
     .masjid-name {
       font-family: 'Playfair Display', serif;
       font-size: clamp(1rem, 2.5vw, 1.4rem);
-      color: var(--gold);
+      color: var(--cream);
       letter-spacing: 0.06em;
       font-weight: 600;
     }
@@ -161,7 +159,7 @@
 
     .amount-btn.other-btn {
       background: rgba(255,255,255,0.12);
-      color: var(--green);
+      color: var(--cream);
       box-shadow: 0 4px 12px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.15);
       border: 3px solid rgba(201,168,76,0.3);
       font-family: 'DM Sans', sans-serif;
@@ -194,7 +192,7 @@
     .currency-sign {
       font-family: 'Playfair Display', serif;
       font-size: clamp(1.3rem, 3vw, 1.8rem);
-      color: var(--green);
+      color: var(--gold);
       font-weight: 700;
     }
     .custom-input-wrap input {
@@ -203,12 +201,12 @@
       outline: none;
       font-family: 'Playfair Display', serif;
       font-size: clamp(1.3rem, 3vw, 1.8rem);
-      font-weight: 700;
-      color: var(--green);
+      font-weight: 600;
+      color: var(--cream);
       padding: clamp(12px, 2vh, 18px) 0;
       background: transparent;
     }
-    .custom-input-wrap input::placeholder { color: rgba(21, 80, 17, 0.4); }
+    .custom-input-wrap input::placeholder { color: rgba(245,240,232,0.4); }
 
     /* ── Square card + donate ── */
     .payment-section {
@@ -338,19 +336,19 @@
 <div class="grid-wrap">
   <div class="amount-grid" id="amount-grid">
     <button class="amount-btn" onclick="selectAmount(5, this)">
-      $5<span class="sub-label"></span>
+      $5<span class="sub-label">Sadaqah</span>
     </button>
     <button class="amount-btn" onclick="selectAmount(10, this)">
-      $10<span class="sub-label"></span>
+      $10<span class="sub-label">Sadaqah</span>
     </button>
     <button class="amount-btn" onclick="selectAmount(20, this)">
-      $20<span class="sub-label"></span>
+      $20<span class="sub-label">Zakat</span>
     </button>
     <button class="amount-btn" onclick="selectAmount(50, this)">
-      $50<span class="sub-label"></span>
+      $50<span class="sub-label">Zakat</span>
     </button>
     <button class="amount-btn" onclick="selectAmount(100, this)">
-      $100<span class="sub-label"></span>
+      $100<span class="sub-label">Zakat</span>
     </button>
     <button class="amount-btn other-btn" onclick="showOther(this)">
       Other
@@ -366,9 +364,8 @@
   </div>
 </div>
 
-<!-- Card + pay section pinned to bottom -->
+<!-- Pay section pinned to bottom -->
 <div class="payment-section">
-  <div id="card-container"></div>
   <button class="donate-btn" id="donate-btn" disabled onclick="handlePayment()">
     Tap Card to Donate
   </button>
@@ -386,36 +383,37 @@
 </div>
 
 <script>
-  // ─── CONFIG ──────────────────────────────────────────────
-  const APP_ID      = 'sandbox-sq0idb-uicypUN4MKqm_VEQzTAiqA'; // Your sandbox App ID
-  const LOCATION_ID = 'LTKZWBFBTH9MS';                 // Your sandbox Location ID
-  const PAYMENT_URL  = 'https://mosque-donation-worker.anamulhoque25.workers.dev/api/process-payment';
-  // ─────────────────────────────────────────────────────────
+  // ─── CONFIG ─────────────────────────────────────────────────────────────────
+  // Get this from developer.squareup.com → Your App → Point of Sale API
+  const SQUARE_APP_ID   = 'sq0idp-xuSR7SCADm1G4QSggPHB9A'; // e.g. sq0idp-XXXXXXXX
+  // Your kiosk URL — Square POS will return here after payment
+  const CALLBACK_URL    = 'https://rubel2125.github.io/gsic-mosque-kiosk/';
+  // ─────────────────────────────────────────────────────────────────────────────
 
   let selectedAmount = null;
-  let card = null;
-  let payments = null;
 
-  async function initSquare() {
-    if (!window.Square) { setStatus('Square SDK failed to load.'); return; }
-    try {
-      payments = window.Square.payments(APP_ID, LOCATION_ID);
-      card = await payments.card({
-        style: {
-          '.input-container': { borderColor: 'rgba(201,168,76,0.4)', borderRadius: '10px' },
-          '.input-container.is-focus': { borderColor: '#C9A84C' },
-          '.input-container.is-error': { borderColor: '#FF8A8A' },
-          input: { color: '#F5F0E8' },
-          '.message-text': { color: 'rgba(245,240,232,0.6)' },
-        }
-      });
-      await card.attach('#card-container');
-      updatePayBtn();
-    } catch (e) {
-      console.error('Square init error:', e);
-      setStatus('Payment terminal unavailable.');
+  // ── On page load: check if Square POS returned a result ──────────────────────
+  window.addEventListener('load', () => {
+    const params = new URLSearchParams(window.location.search);
+    const status         = params.get('status');
+    const errorCode      = params.get('error_code');
+    const transactionId  = params.get('transaction_id');
+
+    if (status === 'ok' && transactionId) {
+      // Payment succeeded — show thank you screen
+      const amountCents = parseInt(sessionStorage.getItem('pendingAmount') || '0');
+      const dollars = amountCents / 100;
+      showSuccess(dollars);
+      // Clean up URL
+      window.history.replaceState({}, '', CALLBACK_URL);
+    } else if (status === 'cancel') {
+      setStatus('Payment cancelled. Please try again.');
+      window.history.replaceState({}, '', CALLBACK_URL);
+    } else if (errorCode) {
+      setStatus('Payment error: ' + errorCode + '. Please try again.');
+      window.history.replaceState({}, '', CALLBACK_URL);
     }
-  }
+  });
 
   function selectAmount(amount, btn) {
     document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('selected'));
@@ -444,7 +442,7 @@
 
   function updatePayBtn() {
     const btn = document.getElementById('donate-btn');
-    btn.disabled = !selectedAmount || !card;
+    btn.disabled = !selectedAmount;
     btn.textContent = selectedAmount
       ? `Donate $${selectedAmount.toFixed(2)}`
       : 'Tap Card to Donate';
@@ -456,47 +454,44 @@
     el.className = type;
   }
 
-  async function handlePayment() {
-    if (!selectedAmount || !card) return;
-    const btn = document.getElementById('donate-btn');
-    btn.disabled = true;
-    btn.textContent = 'Processing…';
-    setStatus('');
+  function handlePayment() {
+    if (!selectedAmount) return;
 
-    try {
-      const result = await card.tokenize();
-      if (result.status !== 'OK') {
-        setStatus(result.errors?.[0]?.message || 'Card error. Please try again.');
-        btn.disabled = false;
-        updatePayBtn();
-        return;
+    const amountCents = Math.round(selectedAmount * 100);
+
+    // Save amount so we can show it on the success screen when POS returns
+    sessionStorage.setItem('pendingAmount', amountCents);
+
+    // Build the Square Point of Sale URL scheme
+    // This launches the Square POS app on the iPad
+    const params = new URLSearchParams({
+      amount_money:    amountCents,
+      currency_code:   'USD',
+      description:     'Masjid Donation',
+      app_id:          SQUARE_APP_ID,
+      callback_url:    CALLBACK_URL,
+      // Options: contact_less_only, manual_card_entry, etc.
+      // Leave blank to let Square POS choose based on reader
+    });
+
+    const posUrl = `square-commerce-v1://payment/create?data=${encodeURIComponent(JSON.stringify({
+      amount_money: { amount: amountCents, currency_code: 'USD' },
+      callback_url: CALLBACK_URL,
+      client_id: SQUARE_APP_ID,
+      version: '1.3',
+      notes: 'Masjid Donation',
+      options: {
+        supported_tender_types: ['CREDIT_CARD', 'CASH', 'OTHER', 'SQUARE_GIFT_CARD', 'CARD_ON_FILE'],
       }
+    }))}`;
 
-      const resp = await fetch(PAYMENT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sourceId: result.token,
-          amount: Math.round(selectedAmount * 100),
-          currency: 'USD',
-          locationId: LOCATION_ID,
-        })
-      });
+    // Launch Square POS app
+    window.location = posUrl;
 
-      const data = await resp.json();
-
-      if (resp.ok && data.payment?.status === 'COMPLETED') {
-        showSuccess(selectedAmount);
-      } else {
-        setStatus(data.error || 'Payment failed. Please try again.');
-        btn.disabled = false;
-        updatePayBtn();
-      }
-    } catch (err) {
-      setStatus('Network error. Please try again.');
-      btn.disabled = false;
-      updatePayBtn();
-    }
+    // If Square POS is not installed, show helpful message after 2 seconds
+    setTimeout(() => {
+      setStatus('Square POS app not found. Please install it from the App Store.');
+    }, 2000);
   }
 
   function showSuccess(amount) {
@@ -506,7 +501,7 @@
     setTimeout(resetKiosk, 12000);
   }
 
-  async function resetKiosk() {
+  function resetKiosk() {
     document.getElementById('success-overlay').classList.remove('show');
     document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('selected'));
     document.getElementById('custom-row').classList.remove('visible');
@@ -514,11 +509,7 @@
     document.getElementById('status-msg').textContent = '';
     selectedAmount = null;
     updatePayBtn();
-    if (card) { await card.destroy(); card = null; }
-    initSquare();
   }
-
-  initSquare();
 </script>
 </body>
 </html>
