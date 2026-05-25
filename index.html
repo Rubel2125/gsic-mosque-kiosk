@@ -2,266 +2,272 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Masjid Donation</title>
-  <link href="https://fonts.googleapis.com/css2?family=Lateef:wght@400;600;700&family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
-
-  <!-- Square Web Payments SDK -->
-  <!-- PRODUCTION: https://web.squarecdn.com/v1/square.js -->
-  <!-- SANDBOX:    https://sandbox.web.squarecdn.com/v1/square.js -->
-  <script type="text/javascript" src="https://sandbox.web.squarecdn.com/v1/square.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Lateef:wght@400;700&family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <script src="https://sandbox.web.squarecdn.com/v1/square.js"></script>
 
   <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
     :root {
+      --green:     #2D5A3D;
+      --green-dk:  #1E3D29;
+      --green-lt:  #3D7A52;
       --gold:      #C9A84C;
       --gold-lt:   #E8C97A;
       --gold-dk:   #9A7535;
-      --green:     #1A3A2A;
-      --green-mid: #2B5C40;
-      --green-lt:  #3D7A57;
-      --cream:     #F9F5EC;
-      --text:      #1A1A1A;
-      --muted:     #6B7B6E;
+      --cream:     #F5F0E8;
+      --cream-dk:  #EAE3D2;
+      --text-dark: #1A2E20;
+      --text-mid:  #4A6B55;
+      --white:     #FFFFFF;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--green);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+    html, body {
+      width: 100%; height: 100%;
       overflow: hidden;
     }
 
-    /* ─── Background pattern ─── */
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: 9FCB98;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      height: 100vh;
+      position: relative;
+    }
+
+    /* ── Background pattern ── */
     body::before {
       content: '';
       position: fixed;
       inset: 0;
       background-image:
         radial-gradient(circle at 20% 20%, rgba(201,168,76,0.08) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(201,168,76,0.06) 0%, transparent 50%),
-        url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C9A84C' fill-opacity='0.04'%3E%3Cpath d='M30 0 L36 12 L30 8 L24 12 Z M30 60 L36 48 L30 52 L24 48 Z M0 30 L12 24 L8 30 L12 36 Z M60 30 L48 24 L52 30 L48 36 Z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        radial-gradient(circle at 80% 80%, rgba(201,168,76,0.06) 0%, transparent 50%);
       pointer-events: none;
       z-index: 0;
     }
 
-    /* ─── Wrapper ─── */
-    .kiosk {
-      position: relative;
-      z-index: 1;
-      width: min(520px, 96vw);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 28px;
+    /* ── Mosque silhouette bottom ── */
+    .bg-silhouette {
+      position: fixed;
+      bottom: 0; left: 0;
+      width: 100%; height: 30%;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 300' preserveAspectRatio='xMidYMax slice'%3E%3Cg fill='%23C9A84C' opacity='0.07'%3E%3Cellipse cx='600' cy='160' rx='90' ry='80'/%3E%3Crect x='510' y='160' width='180' height='140'/%3E%3Crect x='480' y='80' width='22' height='220'/%3E%3Cellipse cx='491' cy='80' rx='11' ry='20'/%3E%3Crect x='698' y='80' width='22' height='220'/%3E%3Cellipse cx='709' cy='80' rx='11' ry='20'/%3E%3Cellipse cx='320' cy='200' rx='60' ry='55'/%3E%3Crect x='260' y='200' width='120' height='100'/%3E%3Crect x='235' y='130' width='16' height='170'/%3E%3Cellipse cx='243' cy='130' rx='8' ry='15'/%3E%3Cellipse cx='880' cy='200' rx='60' ry='55'/%3E%3Crect x='820' y='200' width='120' height='100'/%3E%3Crect x='949' y='130' width='16' height='170'/%3E%3Cellipse cx='957' cy='130' rx='8' ry='15'/%3E%3Cellipse cx='100' cy='230' rx='40' ry='35'/%3E%3Crect x='60' y='230' width='80' height='70'/%3E%3Cellipse cx='1100' cy='230' rx='40' ry='35'/%3E%3Crect x='1060' y='230' width='80' height='70'/%3E%3C/g%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: bottom center;
+      background-size: cover;
+      pointer-events: none;
+      z-index: 0;
     }
 
-    /* ─── Header ─── */
+    /* ── HEADER ── */
     .header {
+      position: relative;
+      z-index: 1;
       text-align: center;
+      padding: clamp(12px, 2.5vh, 24px) 20px clamp(8px, 1.5vh, 16px);
+      width: 100%;
     }
+
     .bismillah {
       font-family: 'Lateef', serif;
-      font-size: clamp(2rem, 5vw, 3rem);
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
       color: var(--gold);
       line-height: 1.2;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
     }
+
     .masjid-name {
       font-family: 'Playfair Display', serif;
-      font-size: clamp(1.1rem, 3vw, 1.4rem);
-      color: var(--cream);
+      font-size: clamp(1rem, 2.5vw, 1.4rem);
+      color: var(--gold);
       letter-spacing: 0.06em;
       font-weight: 600;
     }
-    .tagline {
-      font-size: 0.82rem;
-      color: var(--gold-lt);
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      margin-top: 4px;
-      opacity: 0.8;
-    }
 
-    /* ─── Divider ─── */
     .divider {
-      width: 100%;
+      width: min(400px, 60vw);
       height: 1px;
       background: linear-gradient(to right, transparent, var(--gold-dk), var(--gold), var(--gold-dk), transparent);
-      opacity: 0.6;
+      opacity: 0.5;
+      margin: clamp(4px, 1vh, 10px) auto 0;
     }
 
-    /* ─── Card ─── */
-    .card {
-      background: var(--cream);
-      border-radius: 20px;
-      padding: 32px 28px 28px;
+    /* ── AMOUNT GRID — fills the middle ── */
+    .grid-wrap {
+      position: relative;
+      z-index: 1;
+      flex: 1;
       width: 100%;
-      box-shadow: 0 24px 60px rgba(0,0,0,0.35), 0 0 0 1px rgba(201,168,76,0.2);
+      padding: clamp(8px, 1.5vh, 16px) clamp(12px, 2.5vw, 28px);
+      display: flex;
+      flex-direction: column;
+      gap: clamp(8px, 1.5vh, 14px);
     }
 
-    .card-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.05rem;
-      color: var(--muted);
-      text-align: center;
-      margin-bottom: 20px;
-      letter-spacing: 0.04em;
-    }
-
-    /* ─── Amount Grid ─── */
     .amount-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 12px;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: clamp(8px, 1.5vw, 14px);
+      flex: 1;
     }
 
     .amount-btn {
-      background: white;
-      border: 2px solid #E0D9CC;
-      border-radius: 14px;
-      padding: 20px 12px;
+      background: var(--cream);
+      border: 3px solid transparent;
+      border-radius: clamp(12px, 2vw, 20px);
       cursor: pointer;
-      transition: all 0.18s ease;
+      transition: all 0.15s ease;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 2px;
-      position: relative;
-      overflow: hidden;
-    }
-    .amount-btn::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: var(--gold);
-      opacity: 0;
-      transition: opacity 0.18s;
-    }
-    .amount-btn:hover { border-color: var(--gold); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(201,168,76,0.2); }
-    .amount-btn.selected {
-      border-color: var(--gold);
-      background: linear-gradient(135deg, #FFF8E8, #FFF3D0);
-      box-shadow: 0 4px 16px rgba(201,168,76,0.3);
-    }
-    .amount-btn .amount-label {
+      justify-content: center;
       font-family: 'Playfair Display', serif;
-      font-size: 1.8rem;
+      font-size: clamp(2rem, 6vw, 3.5rem);
       font-weight: 700;
       color: var(--green);
-      line-height: 1;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.8);
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      min-height: 0;
     }
-    .amount-btn .amount-sub {
-      font-size: 0.7rem;
-      color: var(--muted);
+
+    .amount-btn .sub-label {
+      font-family: 'DM Sans', sans-serif;
+      font-size: clamp(0.55rem, 1.2vw, 0.75rem);
+      font-weight: 400;
+      color: var(--text-mid);
       letter-spacing: 0.08em;
       text-transform: uppercase;
+      margin-top: 2px;
     }
-    .amount-btn.selected .amount-label { color: var(--gold-dk); }
-    .amount-btn.selected .amount-sub { color: var(--gold-dk); }
 
-    /* Other row */
-    .other-row {
+    .amount-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(0,0,0,0.25); }
+
+    .amount-btn.selected {
+      background: linear-gradient(135deg, #FFF8E8, #FFF3D0);
+      border-color: var(--gold);
+      box-shadow: 0 6px 20px rgba(201,168,76,0.35);
+      color: var(--gold-dk);
+    }
+    .amount-btn.selected .sub-label { color: var(--gold-dk); }
+
+    .amount-btn.other-btn {
+      background: rgba(255,255,255,0.12);
+      color: var(--green);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.15);
+      border: 3px solid rgba(201,168,76,0.3);
+      font-family: 'DM Sans', sans-serif;
+      font-size: clamp(1.1rem, 3vw, 1.6rem);
+      letter-spacing: 0.04em;
+    }
+    .amount-btn.other-btn.selected {
+      background: rgba(201,168,76,0.2);
+      border-color: var(--gold);
+      color: var(--gold-lt);
+    }
+
+    /* ── Custom amount input ── */
+    .custom-input-row {
+      display: none;
+      width: 100%;
+    }
+    .custom-input-row.visible { display: flex; }
+
+    .custom-input-wrap {
+      width: 100%;
+      background: rgba(255,255,255,0.12);
+      border: 2px solid var(--gold);
+      border-radius: clamp(10px, 2vw, 14px);
       display: flex;
       align-items: center;
+      padding: 0 20px;
       gap: 10px;
-      background: white;
-      border: 2px solid #E0D9CC;
-      border-radius: 14px;
-      padding: 14px 16px;
-      transition: border-color 0.18s;
-      margin-bottom: 20px;
     }
-    .other-row.active { border-color: var(--gold); }
-    .other-row label {
-      font-size: 0.8rem;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      white-space: nowrap;
+    .currency-sign {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.3rem, 3vw, 1.8rem);
+      color: var(--green);
+      font-weight: 700;
     }
-    .other-row input {
+    .custom-input-wrap input {
       flex: 1;
       border: none;
       outline: none;
       font-family: 'Playfair Display', serif;
-      font-size: 1.5rem;
-      color: var(--green);
-      background: transparent;
-      min-width: 0;
-      text-align: right;
-    }
-    .other-row input::placeholder { color: #CCC; font-size: 1rem; }
-    .currency-sign {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.3rem;
-      color: var(--gold-dk);
-    }
-
-    /* ─── Selected summary ─── */
-    .summary {
-      text-align: center;
-      margin-bottom: 16px;
-      min-height: 28px;
-    }
-    .summary-text {
-      font-size: 0.85rem;
-      color: var(--muted);
-    }
-    .summary-amount {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.5rem;
-      color: var(--green);
+      font-size: clamp(1.3rem, 3vw, 1.8rem);
       font-weight: 700;
+      color: var(--green);
+      padding: clamp(12px, 2vh, 18px) 0;
+      background: transparent;
+    }
+    .custom-input-wrap input::placeholder { color: rgba(21, 80, 17, 0.4); }
+
+    /* ── Square card + donate ── */
+    .payment-section {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      padding: 0 clamp(12px, 2.5vw, 28px) clamp(8px, 1.5vh, 16px);
+      display: flex;
+      flex-direction: column;
+      gap: clamp(6px, 1vh, 10px);
     }
 
-    /* ─── Square payment container ─── */
     #card-container {
-      margin-bottom: 16px;
-      min-height: 90px;
+      width: 100%;
+      min-height: 80px;
     }
 
-    /* ─── Pay Button ─── */
-    .pay-btn {
+    .donate-btn {
       width: 100%;
       background: linear-gradient(135deg, var(--gold-dk), var(--gold), var(--gold-lt));
       color: white;
       border: none;
-      border-radius: 14px;
-      padding: 18px;
+      border-radius: clamp(10px, 2vw, 14px);
+      padding: clamp(14px, 2.2vh, 20px);
       font-family: 'DM Sans', sans-serif;
-      font-size: 1rem;
-      font-weight: 500;
-      letter-spacing: 0.08em;
+      font-size: clamp(1rem, 2.5vw, 1.2rem);
+      font-weight: 600;
+      letter-spacing: 0.06em;
       text-transform: uppercase;
       cursor: pointer;
-      transition: all 0.2s;
-      box-shadow: 0 6px 20px rgba(154,117,53,0.35);
+      transition: all 0.15s ease;
+      box-shadow: 0 6px 20px rgba(154,117,53,0.4);
+      -webkit-tap-highlight-color: transparent;
     }
-    .pay-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(154,117,53,0.45); }
-    .pay-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .donate-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 10px 28px rgba(154,117,53,0.5); }
+    .donate-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
-    /* ─── Status message ─── */
     #status-msg {
       text-align: center;
-      font-size: 0.85rem;
-      min-height: 20px;
-      margin-top: 10px;
+      font-size: 0.82rem;
+      min-height: 18px;
+      color: #FF8A8A;
     }
-    #status-msg.error { color: #C0392B; }
-    #status-msg.success { color: var(--green-lt); font-weight: 500; }
+    #status-msg.success { color: var(--gold-lt); }
 
-    /* ─── Success overlay ─── */
+    /* ── Footer ── */
+    .footer {
+      position: relative;
+      z-index: 1;
+      padding: clamp(6px, 1vh, 10px);
+      color: rgba(201,168,76,0.5);
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-align: center;
+    }
+
+    /* ── Success overlay ── */
     .success-overlay {
       position: fixed;
       inset: 0;
-      background: var(--green);
+      background: var(--green-dk);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -269,113 +275,107 @@
       z-index: 100;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.4s;
+      transition: opacity 0.4s ease;
+      padding: 40px;
+      text-align: center;
     }
     .success-overlay.show { opacity: 1; pointer-events: all; }
+
     .checkmark {
-      width: 90px;
-      height: 90px;
+      width: clamp(80px, 16vw, 110px);
+      height: clamp(80px, 16vw, 110px);
       border-radius: 50%;
       background: linear-gradient(135deg, var(--gold-dk), var(--gold-lt));
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 2.8rem;
-      margin-bottom: 24px;
+      font-size: clamp(2.5rem, 7vw, 3.5rem);
+      margin-bottom: 28px;
       box-shadow: 0 12px 40px rgba(201,168,76,0.4);
     }
     .success-title {
       font-family: 'Playfair Display', serif;
-      font-size: 2rem;
+      font-size: clamp(1.8rem, 5vw, 2.6rem);
       color: var(--cream);
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
     .success-sub {
       color: var(--gold-lt);
-      font-size: 0.95rem;
-      letter-spacing: 0.08em;
-      margin-bottom: 32px;
+      font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+      letter-spacing: 0.06em;
+      margin-bottom: 40px;
     }
     .reset-btn {
       background: transparent;
       border: 2px solid var(--gold);
       color: var(--gold);
       border-radius: 12px;
-      padding: 12px 32px;
+      padding: 14px 40px;
       font-family: 'DM Sans', sans-serif;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       letter-spacing: 0.08em;
       text-transform: uppercase;
       cursor: pointer;
       transition: all 0.2s;
     }
-    .reset-btn:hover { background: var(--gold); color: var(--green); }
-
-    /* ─── Footer ─── */
-    .footer {
-      color: rgba(201,168,76,0.45);
-      font-size: 0.72rem;
-      letter-spacing: 0.1em;
-      text-align: center;
-    }
+    .reset-btn:hover { background: var(--gold); color: var(--green-dk); }
   </style>
 </head>
 <body>
 
-<div class="kiosk">
+<div class="bg-silhouette"></div>
 
-  <div class="header">
-    <div class="bismillah">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</div>
-    <div class="masjid-name">Garden State Islamic Center</div>
-    <div class="tagline">May Allah accept your generosity</div>
+<!-- Header (from original design) -->
+<div class="header">
+  <div class="bismillah">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</div>
+  <div class="masjid-name">Garden State Islamic Center</div>
+  <div class="divider"></div>
+</div>
+
+<!-- Amount grid fills remaining space -->
+<div class="grid-wrap">
+  <div class="amount-grid" id="amount-grid">
+    <button class="amount-btn" onclick="selectAmount(5, this)">
+      $5<span class="sub-label"></span>
+    </button>
+    <button class="amount-btn" onclick="selectAmount(10, this)">
+      $10<span class="sub-label"></span>
+    </button>
+    <button class="amount-btn" onclick="selectAmount(20, this)">
+      $20<span class="sub-label"></span>
+    </button>
+    <button class="amount-btn" onclick="selectAmount(50, this)">
+      $50<span class="sub-label"></span>
+    </button>
+    <button class="amount-btn" onclick="selectAmount(100, this)">
+      $100<span class="sub-label"></span>
+    </button>
+    <button class="amount-btn other-btn" onclick="showOther(this)">
+      Other
+    </button>
   </div>
 
-  <div class="divider"></div>
-
-  <div class="card">
-    <div class="card-title">Select Donation Amount</div>
-
-    <div class="amount-grid">
-      <button class="amount-btn" data-amount="5" onclick="selectAmount(5, this)">
-        <span class="amount-label">$5</span>
-        <span class="amount-sub">Sadaqah</span>
-      </button>
-      <button class="amount-btn" data-amount="10" onclick="selectAmount(10, this)">
-        <span class="amount-label">$10</span>
-        <span class="amount-sub">Sadaqah</span>
-      </button>
-      <button class="amount-btn" data-amount="20" onclick="selectAmount(20, this)">
-        <span class="amount-label">$20</span>
-        <span class="amount-sub">Sadaqah</span>
-      </button>
-      <button class="amount-btn" data-amount="50" onclick="selectAmount(50, this)">
-        <span class="amount-label">$50</span>
-        <span class="amount-sub">Sadaqah</span>
-      </button>
-    </div>
-
-    <div class="other-row" id="other-row">
-      <label>Other</label>
+  <!-- Custom amount (shown when Other is tapped) -->
+  <div class="custom-input-row" id="custom-row">
+    <div class="custom-input-wrap">
       <span class="currency-sign">$</span>
       <input type="number" id="custom-amount" placeholder="Enter amount" min="1" oninput="handleCustom(this)" />
     </div>
-
-    <div class="summary" id="summary"></div>
-
-    <!-- Square card UI renders here -->
-    <div id="card-container"></div>
-
-    <button class="pay-btn" id="pay-btn" disabled onclick="handlePayment()">
-      Tap Card to Donate
-    </button>
-
-    <div id="status-msg"></div>
   </div>
-
-  <div class="footer">SECURED BY SQUARE &nbsp;·&nbsp; TAP, SWIPE, OR INSERT</div>
 </div>
 
-<!-- Success Overlay -->
+<!-- Card + pay section pinned to bottom -->
+<div class="payment-section">
+  <div id="card-container"></div>
+  <button class="donate-btn" id="donate-btn" disabled onclick="handlePayment()">
+    Tap Card to Donate
+  </button>
+  <div id="status-msg"></div>
+</div>
+
+<div class="footer">SECURED BY SQUARE &nbsp;·&nbsp; TAP · SWIPE · INSERT</div>
+
+<!-- Success screen -->
 <div class="success-overlay" id="success-overlay">
   <div class="checkmark">✓</div>
   <div class="success-title">JazakAllahu Khayran</div>
@@ -384,82 +384,68 @@
 </div>
 
 <script>
-  // ─── CONFIG ──────────────────────────────────────────────────────────────────
-  // Replace these with your actual Square credentials from developer.squareup.com
-  const APP_ID       = 'sandbox-sq0idb-uicypUN4MKqm_VEQzTAiqA'; // Your App ID
-  const LOCATION_ID  = 'LTKZWBFBTH9MS';  // Your Location ID
-  // Your backend endpoint that calls Square Payments API
+  // ─── CONFIG ──────────────────────────────────────────────
+  const APP_ID      = 'sandbox-sq0idb-uicypUN4MKqm_VEQzTAiqA'; // Your sandbox App ID
+  const LOCATION_ID = 'LTKZWBFBTH9MS';                 // Your sandbox Location ID
   const PAYMENT_URL  = 'https://mosque-donation-worker.anamulhoque25.workers.dev/api/process-payment';
-  // ─────────────────────────────────────────────────────────────────────────────
+  // ─────────────────────────────────────────────────────────
 
   let selectedAmount = null;
   let card = null;
   let payments = null;
 
-  // Init Square SDK
   async function initSquare() {
-    if (!window.Square) {
-      setStatus('Square SDK failed to load.', 'error');
-      return;
-    }
+    if (!window.Square) { setStatus('Square SDK failed to load.'); return; }
     try {
       payments = window.Square.payments(APP_ID, LOCATION_ID);
       card = await payments.card({
         style: {
-          '.input-container': { borderColor: '#E0D9CC', borderRadius: '10px' },
+          '.input-container': { borderColor: 'rgba(201,168,76,0.4)', borderRadius: '10px' },
           '.input-container.is-focus': { borderColor: '#C9A84C' },
-          '.input-container.is-error': { borderColor: '#C0392B' },
-          '.message-text': { color: '#6B7B6E' },
-          '.message-icon': { color: '#6B7B6E' },
-          input: { color: '#1A3A2A' },
-
+          '.input-container.is-error': { borderColor: '#FF8A8A' },
+          input: { color: '#F5F0E8' },
+          '.message-text': { color: 'rgba(245,240,232,0.6)' },
         }
       });
       await card.attach('#card-container');
+      updatePayBtn();
     } catch (e) {
       console.error('Square init error:', e);
-      setStatus('Payment terminal unavailable.', 'error');
+      setStatus('Payment terminal unavailable.');
     }
   }
 
   function selectAmount(amount, btn) {
-    // Deselect all
     document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('selected'));
+    document.getElementById('custom-row').classList.remove('visible');
     document.getElementById('custom-amount').value = '';
-    document.getElementById('other-row').classList.remove('active');
-
     btn.classList.add('selected');
     selectedAmount = amount;
-    updateSummary();
+    updatePayBtn();
+    setStatus('');
+  }
+
+  function showOther(btn) {
+    document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    document.getElementById('custom-row').classList.add('visible');
+    document.getElementById('custom-amount').focus();
+    selectedAmount = null;
     updatePayBtn();
   }
 
   function handleCustom(input) {
-    document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('selected'));
     const val = parseFloat(input.value);
-    if (val > 0) {
-      selectedAmount = val;
-      document.getElementById('other-row').classList.add('active');
-    } else {
-      selectedAmount = null;
-      document.getElementById('other-row').classList.remove('active');
-    }
-    updateSummary();
+    selectedAmount = val > 0 ? val : null;
     updatePayBtn();
   }
 
-  function updateSummary() {
-    const el = document.getElementById('summary');
-    if (selectedAmount) {
-      el.innerHTML = `<span class="summary-text">Donating </span><span class="summary-amount">$${selectedAmount.toFixed(2)}</span>`;
-    } else {
-      el.innerHTML = '';
-    }
-  }
-
   function updatePayBtn() {
-    const btn = document.getElementById('pay-btn');
+    const btn = document.getElementById('donate-btn');
     btn.disabled = !selectedAmount || !card;
+    btn.textContent = selectedAmount
+      ? `Donate $${selectedAmount.toFixed(2)}`
+      : 'Tap Card to Donate';
   }
 
   function setStatus(msg, type = '') {
@@ -470,31 +456,26 @@
 
   async function handlePayment() {
     if (!selectedAmount || !card) return;
-
-    const btn = document.getElementById('pay-btn');
+    const btn = document.getElementById('donate-btn');
     btn.disabled = true;
     btn.textContent = 'Processing…';
     setStatus('');
 
     try {
-      // 1. Tokenize the card
       const result = await card.tokenize();
       if (result.status !== 'OK') {
-        setStatus(result.errors?.[0]?.message || 'Card error. Please try again.', 'error');
+        setStatus(result.errors?.[0]?.message || 'Card error. Please try again.');
         btn.disabled = false;
-        btn.textContent = 'Tap Card to Donate';
+        updatePayBtn();
         return;
       }
 
-      const token = result.token;
-
-      // 2. Send token + amount to your backend
       const resp = await fetch(PAYMENT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          sourceId: token,
-          amount: Math.round(selectedAmount * 100), // cents
+          sourceId: result.token,
+          amount: Math.round(selectedAmount * 100),
           currency: 'USD',
           locationId: LOCATION_ID,
         })
@@ -505,15 +486,14 @@
       if (resp.ok && data.payment?.status === 'COMPLETED') {
         showSuccess(selectedAmount);
       } else {
-        setStatus(data.error || 'Payment failed. Please try again.', 'error');
+        setStatus(data.error || 'Payment failed. Please try again.');
         btn.disabled = false;
-        btn.textContent = 'Tap Card to Donate';
+        updatePayBtn();
       }
     } catch (err) {
-      console.error(err);
-      setStatus('Network error. Please try again.', 'error');
+      setStatus('Network error. Please try again.');
       btn.disabled = false;
-      btn.textContent = 'Tap Card to Donate';
+      updatePayBtn();
     }
   }
 
@@ -521,31 +501,21 @@
     document.getElementById('success-amount').textContent =
       `$${amount.toFixed(2)} received — Barakallahu feekum`;
     document.getElementById('success-overlay').classList.add('show');
-    // Auto-reset after 12 seconds
     setTimeout(resetKiosk, 12000);
   }
 
-  function resetKiosk() {
+  async function resetKiosk() {
     document.getElementById('success-overlay').classList.remove('show');
     document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('selected'));
+    document.getElementById('custom-row').classList.remove('visible');
     document.getElementById('custom-amount').value = '';
-    document.getElementById('other-row').classList.remove('active');
-    document.getElementById('summary').innerHTML = '';
     document.getElementById('status-msg').textContent = '';
     selectedAmount = null;
-    const btn = document.getElementById('pay-btn');
-    btn.disabled = true;
-    btn.textContent = 'Tap Card to Donate';
-    // Re-init card widget
-    if (card) {
-      card.destroy().then(() => {
-        card = null;
-        initSquare();
-      });
-    }
+    updatePayBtn();
+    if (card) { await card.destroy(); card = null; }
+    initSquare();
   }
 
-  // Start
   initSquare();
 </script>
 </body>
